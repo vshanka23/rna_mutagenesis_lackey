@@ -1,0 +1,4 @@
+DEST: /data/Palmetto_sync/Projects/vshanka_rnamut_dna/Ethanol_DMS
+SOURCE: /data/gsl/bsl/vshanka/vshanka_riboswitch_dna/FASTQ
+BARCODE_SOURCE_PREFIX: "Ribo82922-1_S1"
+LIB_SCRIPT: /data/Palmetto_sync/Projects/vshanka_rnamut_dna/pipeline/bash_scripts
