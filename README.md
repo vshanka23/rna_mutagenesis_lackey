@@ -1,6 +1,6 @@
 # Impact of degenerate tri-nucleotide quartet and chemical treatment on RNA structure
 ## Pipeline built using snakemake
-![Pipeline Schematic (WIP)](https://github.com/vshanka23/rna_mutagenesis_lackey/blob/main/rnamut_pipeline_v1-01.jpeg)
+![Pipeline Schematic (WIP)](https://github.com/vshanka23/rna_mutagenesis_lackey/blob/main/rnamut_pipeline_v1-01.jpg)
 ### Directory structure
 There are 4 main directories, each corresponding to a section of the pipeline. Each section consists of its own snakemake workflow components.
 1. Library: This directory comprises the snakemake workflow and associated scripts to run the part of the pipeline the generate the tri-nucleotide quartet and the 12 nucleotide barcode sequence. These serve as the reference points for the non-WT analysis. The barcodes from this snakemake workflow will be used to extract sequences from the chemical treated non-WT samples. Briefly, this pipeline does the following:
