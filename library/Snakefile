@@ -22,7 +22,7 @@ rule run_flash:
 		R1=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].R1_merged.fastq.gz,
 		R2=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].R2_merged.fastq.gz
 	output:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].extendedFrags.fastq"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].extendedFrags.fastq
 	params:
 		script=config["LIB_SCRIPT"]+"/1_run_flash.sh",
 		prefix=config["BARCODE_SOURCE_PREFIX"]
@@ -35,9 +35,9 @@ rule run_flash:
 ##Need to check the histogram files from flash before the min max lengths can be set. Alternatively, we can add a step here that auto-queries the histogram files for the largest mode (or max sum) to select a min/max length.
 rule template:
 	input:
-		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].extendedFrags.fastq"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].extendedFrags.fastq
 	output:
-		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].lenfilt.fastq"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].lenfilt.fastq
 	params:
 		min="200"
 		max="220"
