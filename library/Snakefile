@@ -35,9 +35,9 @@ rule run_flash:
 ##Need to check the histogram files from flash before the min max lengths can be set. Alternatively, we can add a step here that auto-queries the histogram files for the largest mode (or max sum) to select a min/max length.
 rule template:
 	input:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].extendedFrags.fastq"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].extendedFrags.fastq"
 	output:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].lenfilt.fastq"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].lenfilt.fastq"
 	params:
 		min="200"
 		max="220"
@@ -50,9 +50,9 @@ rule template:
 
 rule fastq_to_fasta:
 	input:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].lenfilt.fastq"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].lenfilt.fastq
 	output:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].lenfilt.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].lenfilt.fasta
 	params:
 		config["LIB_SCRIPT"]+"/3_fastq_to_fasta.sh"
 	resources: cpus=2, mem_mb=16000, time_min=14400
@@ -63,9 +63,9 @@ rule fastq_to_fasta:
 
 rule extract_matching:
 	input:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].lenfilt.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].lenfilt.fasta
 	output:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].target_set.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].target_set.fasta
 	params:
 		config["LIB_SCRIPT"]+"/4_extract_target_seqs.sh"
 	resources: cpus=2, mem_mb=16000, time_min=14400
@@ -76,9 +76,9 @@ rule extract_matching:
 
 rule filter_insertions:
 	input:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].target_set.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].target_set.fasta
 	output:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].filt_target_set.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].filt_target_set.fasta
 	params:
 		min="219"
 		max="219"
@@ -91,9 +91,9 @@ rule filter_insertions:
 
 rule align_and_process:
 	input:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].filt_target_set.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].filt_target_set.fasta
 	output:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta
 	params:
 		config["LIB_SCRIPT"]+"6_align_process.sh"
 	resources: cpus=8, mem_mb=128000, time_min=14400
@@ -104,9 +104,9 @@ rule align_and_process:
 
 rule motif_match:
 	input:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta
 	output:
-		config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].pos.txt"
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].pos.txt
 	params:
 		config["LIB_SCRIPT"]+"7_motif_match.sh"
 	resources: cpus=2, mem_mb=16000, time_min=14400
@@ -117,11 +117,11 @@ rule motif_match:
 
 rule generate_index_bc:
 	input:
-		fasta=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta",
-		pos=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].pos.txt"
+		fasta=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta,
+		pos=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].pos.txt
 	output:
-		output=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].output.txt",
-		barcode=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].barcodes.txt"
+		output=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output.txt,
+		barcode=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].barcodes.txt
 	params:
 		config["LIB_SCRIPT"]+"8_generate_index_bc.sh"
 	resources: cpus=2, mem_mb=16000, time_min=14400
@@ -132,15 +132,15 @@ rule generate_index_bc:
 		
 rule make_barcode_library:
 	input:
-		output=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].output.txt",
-		barcode=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].barcodes.txt"
+		output=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output.txt,
+		barcode=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].barcodes.txt
 	output:
-		output_dedup=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].output_dedup.txt",
-		output_linear=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].output_dedup_linear.txt",
-		barcode_uniq=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].barcodes_uniq.txt"
+		output_dedup=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output_dedup.txt,
+		output_linear=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output_dedup_linear.txt,
+		barcode_uniq=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].barcodes_uniq.txt
 	params:
 		script=config["LIB_SCRIPT"]+"9_mk_bc_library.sh"
-		library=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"]_library"
+		library=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]_library
 	resources: cpus=2, mem_mb=16000, time_min=14400
 	shell:
 		"""

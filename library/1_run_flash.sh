@@ -14,4 +14,5 @@ fi
 
 # Run FLASH to merge overlapping paired-end reads
 module add flash
-flash "$1" "$2" -M 150 -O -d -o "$3"
+echo "flash "$1" "$2" -M 150 -O -d -o "$3""
+flash "$1" "$2" -M 150 -O -o "$3"
