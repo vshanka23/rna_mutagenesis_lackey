@@ -24,7 +24,7 @@ motifs=("TCGAATGCGC" "ATATAA" "TAATGATATGGTTTG" "AAACTCTTGATTAT" "GACCGGAGTCGAGT
 positions=()
 for motif in "${motifs[@]}"
 do
-    position=$(echo "$first_sequence" | grep -b -o "$motif" | awk -F: '{print $1 + length($2)}' | tail -n 1)
+    position=$(echo "$first_sequence" | grep -b -o -i "$motif" | awk -F: '{print $1 + length($2)}' | tail -n 1)
     if [ -z "$position" ]; then
         position="NA"
     fi

@@ -10,7 +10,7 @@ fi
 module add mafft
 
 # Align the concatenated sequences using MAFFT
-mafft --auto --thread 8 "${1}" > "${2}_aligned.fasta"
+mafft --op 10 --ep 5 --thread 8 --threadtb 5 --threadit 0 --reorder --anysymbol --large --retree 2 "${1}" > "${2}_aligned.fasta"
 
 # Get alignment output from MAFFT and linearize it again
 awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}' < "${2}_aligned.fasta" > "${2}_aligned_linear.fasta"
