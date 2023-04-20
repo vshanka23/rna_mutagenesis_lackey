@@ -33,7 +33,7 @@ rule run_flash:
 		"""
 
 ##Need to check the histogram files from flash before the min max lengths can be set. Alternatively, we can add a step here that auto-queries the histogram files for the largest mode (or max sum) to select a min/max length.
-rule template:
+rule length_filter:
 	input:
 		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].extendedFrags.fastq
 	output:
