@@ -14,6 +14,7 @@ fi
 
 # Load the bbmap module
 module add bbmap
+module add java_jdk
 
 # Assign input and output files and parameters to variables
 input_file=$1
