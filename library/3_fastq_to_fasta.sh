@@ -13,4 +13,4 @@ if [ ! -f "$1" ]; then
 fi
 
 # Convert the input file from FASTQ to FASTA format
-awk 'BEGIN {FS = "\t" ; OFS = "\n"} {header = ">"$1 ; seq = $2 ; print header, seq}' "$1" > "$2"
+sed -n '1~4s/^@/>/p;2~4p' "$1" > "$2"
