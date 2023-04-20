@@ -95,7 +95,7 @@ rule align_and_process:
 	output:
 		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta
 	params:
-		config["LIB_SCRIPT"]+"6_align_process.sh"
+		config["LIB_SCRIPT"]+"/6_align_process.sh"
 	resources: cpus=8, mem_mb=128000, time_min=14400
 	shell:
 		"""
