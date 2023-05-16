@@ -1,6 +1,6 @@
 rule all:
 	input:
-		barcode_uniq=config["DEST"]+"/"+"config["BARCODE_SOURCE_PREFIX"].barcodes_uniq.txt"
+		dynamic(config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]_library+"/"+"FASTQs"+"/"+{degen}.fastq)
 
 rule merge_lanes:
 	input:
@@ -115,34 +115,55 @@ rule motif_match:
 		{params} {input} {output}
 		"""
 
-rule generate_index_bc:
+rule generate_index_degen:
 	input:
 		fasta=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].aligned_linear_noheader.fasta,
 		pos=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].pos.txt
 	output:
 		output=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output.txt,
 		barcode=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].barcodes.txt
+		degen=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].degen.txt
 	params:
 		config["LIB_SCRIPT"]+"8_generate_index_bc.sh"
 	resources: cpus=2, mem_mb=16000, time_min=14400
 	shell:
 		"""
-		{params} {input.fasta} {input.pos} {output.output} {output.barcode}
+		{params} {input.fasta} {input.pos} {output.output} {output.barcode} {output.degen}
 		"""
+
+def read_degen_list(degen_uniq)
+	with open(degen_uniq) as file:
+		degen_list = line.strip() for line in file]
+	return degen_list	
 		
-rule make_barcode_library:
+		
+rule make_degen_library:
 	input:
 		output=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output.txt,
-		barcode=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].barcodes.txt
+		degen=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].degen.txt
 	output:
 		output_dedup=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output_dedup.txt,
 		output_linear=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].output_dedup_linear.txt,
-		barcode_uniq=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].barcodes_uniq.txt
+		degen_uniq=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].degen_uniq.txt,
+		dynamic(config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]_library+"/"+{degen}.fasta)
 	params:
-		script=config["LIB_SCRIPT"]+"9_mk_bc_library.sh",
+		script=config["LIB_SCRIPT"]+"9.5_mk_degen_library.sh",
 		library=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]_library
 	resources: cpus=2, mem_mb=16000, time_min=14400
 	shell:
 		"""
-		{params.script} {input.output} {input.barcode} {output.output_dedup} {output.output_linear} {output.barcode_uniq} {params.library}
+		{params.script} {input.output} {input.degen} {output.output_dedup} {output.output_linear} {output.degen_uniq} {params.library}
 		"""
+
+rule convert_fasta_to_fastq:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]_library+"/"+{degen}.fasta
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]_library+"/"+"FASTQs"+"/"+{degen}.fastq
+	params:
+		script=config["LIB_SCRIPT"]+"10_fasta_to_fastq.sh",
+		fastq=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"].lenfilt.fastq
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input} {params.fastq} {output}

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$#" -ne 4 ]; then
+if [ "$#" -ne 5 ]; then
     echo "Error: Incorrect number of input arguments."
     echo "Usage: $0 input_fasta input_file output_file barcode_output_file"
     exit 1
@@ -8,8 +8,9 @@ fi
 
 input_fasta=$1
 input_file=$2
-output_file=$3
+alignment_output_file=$3
 barcode_output_file=$4
+degen_output_file=$5
 
 if [ ! -f "$input_fasta" ]; then
     echo "Error: Input fasta file $input_fasta not found."
@@ -33,7 +34,9 @@ while read line; do
     tri4=${line1:$d:3}
     bc=${line1:$e:12}
     index=">${tri1}_${tri2}_${tri3}_${tri4}_${bc}"
-    echo $index >> $output_file
-    echo $line >> $output_file
+    degen="${tri1}_${tri2}_${tri3}_${tri4}"
+    echo $index >> $alignment_output_file
+    echo $line >> $alignment_output_file
     echo ${bc} >> $barcode_output_file
+    echo ${degen} >> $degen_output_file
 done < $input_fasta
