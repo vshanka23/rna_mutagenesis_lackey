@@ -1,4 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 5 of /data/Palmetto_sync/Projects/vshanka_rnamut_dna/pipeline/bash_scripts/library/Snakefile_degen:
-Missing input files for rule merge_lanes:
-/data/gsl/bsl/vshanka/vshanka_riboswitch_dna/FASTQRibo82922-1_S1_L001_R1_001.fastq.gz

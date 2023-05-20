@@ -1,3 +1,0 @@
-AttributeError in line 159 of /data/Palmetto_sync/Projects/vshanka_rnamut_dna/pipeline/bash_scripts/library/Snakefile_degen:
-'str' object has no attribute 'lenfilt'
-  File "/data/Palmetto_sync/Projects/vshanka_rnamut_dna/pipeline/bash_scripts/library/Snakefile_degen", line 159, in <module>

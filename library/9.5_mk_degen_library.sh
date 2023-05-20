@@ -25,5 +25,5 @@ awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}'
 cat "$degen_output_file" | sort | uniq > "$degen_uniq_txt"
 
 # Create a library based on barcodes
-mkdir -p "$library_dir"
-cat "$degen_uniq_txt" | while read line; do search_string=">${line}_"; grep -A 1 --no-group-separator ${search_string} "$output_dedup_linear_fasta" > "${library_dir}/${line}.fasta"; grep -oP "${search_string}\K.*" "$output_dedup_linear_fasta" > "${library_dir}/${line}.bc" done
+mkdir -p "$degen_library_dir"
+cat "$degen_uniq_txt" | while read line; do search_string=">${line}_"; grep -A 1 --no-group-separator ${search_string} "$output_dedup_linear_fasta" > "${degen_library_dir}/${line}.fasta"; grep -oP "${search_string}\K.*" "$output_dedup_linear_fasta" > "${degen_library_dir}/${line}.bc"; done

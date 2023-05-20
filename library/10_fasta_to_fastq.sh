@@ -24,7 +24,7 @@ awk '!/^>/{ printf "%s", $0; n = "\n" } /^>/{ print n $0; n = "" } END{ printf "
 while IFS= read -r sequence
 do
   # Extract the matching sequence from the FASTQ file
-  grep -A 3 -F -m 1 -w "$sequence" "$fastq_file" >> "$output_file"
+  grep -B 1 -A 2 -F -m 1 -w "$sequence" "$fastq_file" >> "$output_file"
 done < "$tmp_fasta"
 
 # Clean up the temporary file

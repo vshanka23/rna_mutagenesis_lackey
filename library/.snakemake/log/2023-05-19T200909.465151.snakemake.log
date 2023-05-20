@@ -1,3 +1,0 @@
-SyntaxError:
-A rule with dynamic output may not define any non-dynamic output files.
-  File "/data/Palmetto_sync/Projects/vshanka_rnamut_dna/pipeline/bash_scripts/library/Snakefile_degen", line 148, in <module>
