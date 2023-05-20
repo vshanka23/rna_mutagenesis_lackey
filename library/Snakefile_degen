@@ -1,0 +1,165 @@
+rule all:
+	input:
+		dynamic(config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library"+"/"+"FASTQs"+"/"+"{degen}.fastq")
+
+rule merge_lanes:
+	input:
+		file=config["SOURCE"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_L001_R1_001.fastq.gz",
+		dir=config["SOURCE"]
+	output:
+		R1=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R1_merged.fastq.gz",
+		R2=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R2_merged.fastq.gz"
+	params: 
+		script=config["DEST"]+"/"+"0_merge_lanes.sh",
+		prefix=config["BARCODE_SOURCE_PREFIX"]
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {params.prefix} {input.dir} {output.R1} {output.R2}
+		"""
+
+rule run_flash:
+	input:
+		R1=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R1_merged.fastq.gz",
+		R2=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R2_merged.fastq.gz"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".extendedFrags.fastq"
+	params:
+		script=config["DEST"]+"/1_run_flash.sh",
+		prefix=config["BARCODE_SOURCE_PREFIX"]
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input.R1} {input.R2} {params.prefix}
+		"""
+
+##Need to check the histogram files from flash before the min max lengths can be set. Alternatively, we can add a step here that auto-queries the histogram files for the largest mode (or max sum) to select a min/max length.
+rule length_filter:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".extendedFrags.fastq"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".lenfilt.fastq"
+	params:
+		min="200",
+		max="220",
+		script=config["DEST"]+"/2_length_filter.sh"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input} {output} {params.min} {params.max}
+		"""
+
+rule fastq_to_fasta:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".lenfilt.fastq"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".lenfilt.fasta"
+	params:
+		config["DEST"]+"/3_fastq_to_fasta.sh"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params} {input} {output}
+		"""
+
+rule extract_matching:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".lenfilt.fasta"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".target_set.fasta"
+	params:
+		config["DEST"]+"/4_extract_target_seqs.sh"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params} {input} {output}
+		"""
+
+rule filter_insertions:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".target_set.fasta"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".filt_target_set.fasta"
+	params:
+		min="219",
+		max="219",
+		script=config["DEST"]+"/5_filters_insertions.sh"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input} {output} {params.min} {params.max}
+		"""
+
+rule align_and_process:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".filt_target_set.fasta"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".aligned_linear_noheader.fasta"
+	params:
+		config["DEST"]+"/6_align_process.sh"
+	resources: cpus=8, mem_mb=128000, time_min=14400
+	shell:
+		"""
+		{params} {input} {output}
+		"""
+
+rule motif_match:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".aligned_linear_noheader.fasta"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".pos.txt"
+	params:
+		config["DEST"]+"/7_motif_match.sh"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params} {input} {output}
+		"""
+
+rule generate_index_degen:
+	input:
+		fasta=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".aligned_linear_noheader.fasta",
+		pos=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".pos.txt"
+	output:
+		output=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".output.txt",
+		barcode=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".barcodes.txt",
+		degen=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".degen.txt"
+	params:
+		config["DEST"]+"/8_generate_index_bc.sh"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params} {input.fasta} {input.pos} {output.output} {output.barcode} {output.degen}
+		"""
+		
+rule make_degen_library:
+	input:
+		output=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".output.txt",
+		degen=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".degen.txt"
+	output:
+		dynamic(config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library"+"/"+"{degen}.fasta")
+	params:
+		script=config["DEST"]+"/9.5_mk_degen_library.sh",
+		library=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library",
+		output_dedup=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".output_dedup.txt",
+		output_linear=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".output_dedup_linear.txt",
+		degen_uniq=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".degen_uniq.txt"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input.output} {input.degen} {params.output_dedup} {params.output_linear} {params.degen_uniq} {params.library}
+		"""
+
+rule convert_fasta_to_fastq:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library"+"/"+"{degen}.fasta"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library"+"/"+"FASTQs"+"/"+"{degen}.fastq"
+	params:
+		script=config["DEST"]+"/10_fasta_to_fastq.sh",
+		fastq=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".lenfilt.fastq"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input} {params.fastq} {output}
+		"""

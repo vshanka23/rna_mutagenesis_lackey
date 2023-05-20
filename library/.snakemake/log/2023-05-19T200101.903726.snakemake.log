@@ -1,0 +1,3 @@
+AttributeError in line 10 of /data/Palmetto_sync/Projects/vshanka_rnamut_dna/pipeline/bash_scripts/library/Snakefile_degen:
+'str' object has no attribute 'R1_merged'
+  File "/data/Palmetto_sync/Projects/vshanka_rnamut_dna/pipeline/bash_scripts/library/Snakefile_degen", line 10, in <module>
