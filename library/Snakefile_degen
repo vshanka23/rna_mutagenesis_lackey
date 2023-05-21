@@ -97,10 +97,10 @@ rule align_and_process:
 		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".aligned_linear_noheader.fasta"
 	params:
 		config["DEST"]+"/6_align_process.sh"
-	resources: cpus=8, mem_mb=128000, time_min=14400
+	resources: cpus=40, mem_mb=128000, time_min=14400
 	shell:
 		"""
-		{params} {input} {output}
+		{params} {input} {output} 40 40
 		"""
 
 rule motif_match:
