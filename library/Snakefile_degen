@@ -97,10 +97,10 @@ rule align_and_process:
 		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".aligned_linear_noheader.fasta"
 	params:
 		config["DEST"]+"/6_align_process.sh"
-	resources: cpus=40, mem_mb=128000, time_min=14400
+	resources: cpus=8, mem_mb=128000, time_min=14400
 	shell:
 		"""
-		{params} {input} {output} 40 40
+		{params} {input} {output}
 		"""
 
 rule motif_match:
@@ -139,7 +139,7 @@ rule make_degen_library:
 	output:
 		dynamic(config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library"+"/"+"{degen}.fasta")
 	params:
-		script=config["DEST"]+"/9.5_mk_degen_library.sh",
+		script=config["DEST"]+"/9.6_mk_degen_library.sh",
 		library=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library",
 		output_dedup=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".output_dedup.txt",
 		output_linear=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".output_dedup_linear.txt",
