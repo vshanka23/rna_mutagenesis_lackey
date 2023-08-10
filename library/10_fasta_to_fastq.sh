@@ -31,10 +31,10 @@ while IFS= read -r sequence
 do
   # Extract the matching sequence from the FASTQ file
   grep -B 1 -A 2 -F -m 1 -w "$sequence" "$fastq_file" >> "$output_file"
-done < <(awk '/^[^>]/ { printf "%s", $0; n = "\n" } END { printf "%s", n }' "$fasta_file")
+done < <(awk '/^[^>]/ { printf "%s", sep $0; sep="\n" } END { printf "%s", sep }' "$fasta_file")
 
 # Clean up the temporary file
-rm "$tmp_fasta"
+#rm "$tmp_fasta"
 
 echo "FASTQ sequences extracted and saved to $output_file."
 
