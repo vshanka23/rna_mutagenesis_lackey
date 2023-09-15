@@ -1,3 +1,3 @@
 DEST: /data/Palmetto_sync/Projects/vshanka_rnamut_dna/Ethanol_DMS
-SOURCE: /data/gsl/bsl/vshanka/vshanka_riboswitch_dna/FASTQ
-BARCODE_SOURCE_PREFIX: "Ribo82922-1_S1"
+SOURCE: /data2/lackey_lab/Critical/NextSeq_Data/Oct18-23_NextSeq_ribo_pool_run-367236873/AddRiboPools_90822/
+BARCODE_SOURCE_PREFIX: "Ribo90822-9_S9"
