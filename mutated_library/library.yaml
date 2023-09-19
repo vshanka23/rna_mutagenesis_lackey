@@ -1,0 +1,6 @@
+DEST: /data/Palmetto_sync/Projects/vshanka_rnamut_dna/Ethanol_DMS/mutated
+SOURCE: /data2/lackey_lab/Critical/NextSeq_Data/Oct18-23_NextSeq_ribo_pool_run-367236873/AddRiboPools_90822
+BARCODE_SOURCE_PREFIX: "Ribo90822-8_S8"
+UNMOD: /data/Palmetto_sync/Projects/vshanka_rnamut_dna/Ethanol_DMS/Ribo90822-9_S9_library
+COMPARE: /data/Palmetto_sync/Projects/vshanka_rnamut_dna/Ethanol_DMS/compare
+TEMPLATE: /data/Palmetto_sync/Projects/vshanka_rnamut_dna/Ethanol_DMS/compare/target.fasta

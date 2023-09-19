@@ -1,0 +1,84 @@
+degen=sorted(glob_wildcards(config["UNMOD"]+"/{degen}"+".bc").degen)
+
+rule all:
+	input:
+		expand(config["COMPARE"]+"/"+"{degen}_complete.txt",degen=degen)
+
+rule merge_lanes:
+	input:
+		file=config["SOURCE"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_L001_R1_001.fastq.gz",
+		dir=config["SOURCE"]
+	output:
+		R1=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R1_merged.fastq.gz",
+		R2=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R2_merged.fastq.gz"
+	params: 
+		script=config["DEST"]+"/"+"0_merge_lanes.sh",
+		prefix=config["BARCODE_SOURCE_PREFIX"]
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {params.prefix} {input.dir} {output.R1} {output.R2}
+		"""
+
+rule run_flash:
+	input:
+		R1=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R1_merged.fastq.gz",
+		R2=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".R2_merged.fastq.gz"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".extendedFrags.fastq"
+	params:
+		script=config["DEST"]+"/1_run_flash.sh",
+		prefix=config["BARCODE_SOURCE_PREFIX"]
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input.R1} {input.R2} {params.prefix}
+		"""
+
+##Need to check the histogram files from flash before the min max lengths can be set. Alternatively, we can add a step here that auto-queries the histogram files for the largest mode (or max sum) to select a min/max length.
+rule length_filter:
+	input:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".extendedFrags.fastq"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".lenfilt.fastq"
+	params:
+		min="200",
+		max="220",
+		script=config["DEST"]+"/2_length_filter.sh"
+	resources: cpus=2, mem_mb=16000, time_min=14400
+	shell:
+		"""
+		{params.script} {input} {output} {params.min} {params.max}
+		"""
+
+rule convert_fasta_to_fastq:
+	input:
+		degen=config["UNMOD"]+"/{degen}"+".bc",
+                fastq=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+".lenfilt.fastq"
+	output:
+		config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library"+"/"+"FASTQs"+"/"+"{degen}.fastq"
+	params:
+		script=config["DEST"]+"/3_fasta_to_fastq.sh"
+	resources: cpus=1, mem_mb=2000, time_min=14400
+	shell:
+		"""
+		{params.script} {input.degen} {input.fastq} {output}
+		"""
+
+rule shapemapper:
+        input:
+                unmod=config["UNMOD"]+"/"+"FASTQs"+"/"+"{degen}.fastq",
+                mod=config["DEST"]+"/"+config["BARCODE_SOURCE_PREFIX"]+"_library"+"/"+"FASTQs"+"/"+"{degen}.fastq"
+        output:
+                config["COMPARE"]+"/"+"{degen}_complete.txt"
+        params:
+                script=config["DEST"]+"/4_shapemapper.sh",
+                degen=config["COMPARE"]+"/"+"{degen}",
+                temp=config["COMPARE"]+"/"+"{degen}_temp",
+                log=config["COMPARE"]+"/"+"{degen}_log.txt"        
+        resources: cpus=1, mem_mb=2000, time_min=14400
+        shell:
+                """
+                {params.script} -d {params.degen} -u {input.unmod} -m {input.mod} -o {params.temp} -l {params.log}
+                touch {output}
+                """
