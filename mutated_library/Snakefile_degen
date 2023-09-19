@@ -73,12 +73,14 @@ rule shapemapper:
                 config["COMPARE"]+"/"+"{degen}_complete.txt"
         params:
                 script=config["DEST"]+"/4_shapemapper.sh",
-                degen=config["COMPARE"]+"/"+"{degen}",
+                degen="{degen}",
+                workdir=config["COMPARE"],
                 temp=config["COMPARE"]+"/"+"{degen}_temp",
                 log=config["COMPARE"]+"/"+"{degen}_log.txt"        
         resources: cpus=1, mem_mb=2000, time_min=14400
         shell:
                 """
+                cd {params.workdir}
                 {params.script} -d {params.degen} -u {input.unmod} -m {input.mod} -o {params.temp} -l {params.log}
                 touch {output}
                 """
